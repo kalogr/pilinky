@@ -16,6 +16,7 @@ class TeleinfoReader:
         self.port = port
         self.last_display_times = {}
         self.energy_history = deque(maxlen=10)
+        self.injection_history = deque(maxlen=10)
         self.power_history = deque(maxlen=10)
 
         self.mqtt = MQTTClient(broker="localhost")
@@ -61,8 +62,8 @@ class TeleinfoReader:
                         self.publish_measurement("Total active energy (Wh)", value, "totalenergy", 10)
 
                 elif label == 'EASF02': # Total injection in Wh
-                    if not is_monotonic_increase(value, self.energy_history):
+                    if not is_monotonic_increase(value, self.injection_history):
                         continue
-                    if not is_outlier(value, self.energy_history):
+                    if not is_outlier(value, self.injection_history):
                         self.energy_history.append(int(value))
                         self.publish_measurement("Total injection (Wh)", value, "injection", 10)
