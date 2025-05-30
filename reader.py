@@ -21,12 +21,13 @@ class TeleinfoReader:
         self.mqtt = MQTTClient(broker="localhost")
         self.mqtt.connect()
 
-    def display_measurement(self, label, value, interval):
-        ''' Display the measurement if the interval has passed since the last display.'''
+    def publish_measurement(self, label, value, publish_id,  interval):
+        ''' Publish the measurement if the interval has passed since the last publish.'''
 
         now = time.time()
         if now - self.last_display_times.get(label, 0) >= interval:
             logging.info(f"{label}: {int(value)}")
+            self.mqtt.publish(publish_id, int(value))
             self.last_display_times[label] = now
 
     def run(self):
@@ -50,21 +51,18 @@ class TeleinfoReader:
                         continue
                     if not is_outlier(value, self.power_history):
                         self.power_history.append(int(value))
-                        self.display_measurement("Instantaneous power (VA)", value, 10)
-                        self.mqtt.publish("power", int(value))
+                        self.publish_measurement("Instantaneous power (VA)", value, "power", 10)
 
                 elif label == 'EAST': # Active power in Wh
                     if not is_monotonic_increase(value, self.energy_history):
                         continue
                     if not is_outlier(value, self.energy_history):
                         self.energy_history.append(int(value))
-                        self.display_measurement("Total active energy (Wh)", value, 10)
-                        self.mqtt.publish("totalenergy", int(value))
+                        self.publish_measurement("Total active energy (Wh)", value, "totalenergy", 10)
 
                 elif label == 'EASF02': # Total injection in Wh
                     if not is_monotonic_increase(value, self.energy_history):
                         continue
                     if not is_outlier(value, self.energy_history):
                         self.energy_history.append(int(value))
-                        self.display_measurement("Total injection (Wh)", value, 10)
-                        self.mqtt.publish("injection", int(value))
+                        self.publish_measurement("Total injection (Wh)", value, "injection", 10)

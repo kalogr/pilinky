@@ -27,7 +27,7 @@ class MQTTClient:
         self.dry_run = dry_run
         self.topic_prefix = topic_prefix
 
-    def on_connect(self, client, userdata, flags, rc):
+    def on_connect(self, client, userdata, flags, rc, properties):
         """
         Callback when the client connects to the MQTT broker.
 
