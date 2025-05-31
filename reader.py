@@ -61,9 +61,9 @@ class TeleinfoReader:
                         self.energy_history.append(int(value))
                         self.publish_measurement("Total active energy (kWh)", value, "totalenergy", 10)
 
-                elif label == 'EASF02': # Total injection in Wh
-                    if not is_monotonic_increase(value, self.injection_history):
-                        continue
-                    if not is_outlier(value, self.injection_history):
-                        self.injection_history.append(int(value))
-                        self.publish_measurement("Total injection (kWh)", value, "injection", 10)
+                #elif label == 'EASF02': # Total injection in Wh
+                    #if not is_monotonic_increase(value, self.injection_history):
+                    #    continue
+                    #if not is_outlier(value, self.injection_history):
+                    #    self.injection_history.append(int(value))
+                    #    self.publish_measurement("Total injection (kWh)", value, "injection", 10)
